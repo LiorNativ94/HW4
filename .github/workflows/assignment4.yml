@@ -17,7 +17,6 @@ jobs:
         run: |
           echo "$(date -Iminutes)" > log.txt
           echo "Lior Nativ" >> log.txt  # Replace with actual submitter names
-          cat build_status.txt >> log.txt
 
       - name: Build Docker images
         id: build_images
