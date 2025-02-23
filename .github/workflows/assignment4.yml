@@ -56,7 +56,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Download stocks1 image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: stocks1-image
+          path: /tmp
 
+      - name: Download capital gains image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: capital-gains-image
+          path: /tmp
+
+      - name: Verify downloaded artifact
+        run: ls -l /tmp
+        
       - name: Load Docker images
         run: |
           docker load -i /tmp/stocks1_image.tar
