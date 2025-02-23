@@ -89,6 +89,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest requests
+          
+      - name: List repository contents
+        run: ls -l  # This will show the contents of the root directory
+
+      - name: List tests directory
+        run: ls -l tests/  # This will show the contents of the tests directory if it exists
 
       - name: Test with pytest
         run: |
