@@ -1,0 +1,65 @@
+name: assignment4
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export stocks1 image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./stocks1
+          file: ./stocks1/Dockerfile
+          push: false
+          tags: stocks1:latest
+          outputs: |
+            image: /tmp/stocks1_image.tar
+
+      - name: Build and export capital gains image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./capital_gains
+          file: ./capital_gains/Dockerfile
+          push: false
+          tags: capital-gains:latest
+          outputs: |
+            image: /tmp/capital_gains_image.tar
+
+      - name: Upload Docker images as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stockapp-images
+          path: |
+            /tmp/stocks1_image.tar
+            /tmp/capital_gains_image.tar  
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      mongo:
+        image: mongo
+        ports:
+          - 27017:27017
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Load Docker images
+        run: |
+          docker load -i /tmp/stocks1_image.tar
+          docker load -i /tmp/capital_gains_image.tar
+
+      - name: Run Docker Compose
+        run: |
+          docker-compose -f docker-compose.yml up -d
+
+  
