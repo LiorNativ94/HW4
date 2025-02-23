@@ -20,8 +20,7 @@ jobs:
           file: ./stocks1/Dockerfile
           push: false
           tags: stocks1:latest
-          outputs: |
-            image: /tmp/stocks1_image.tar
+          outputs: type=docker ,dest=/tmp/stocks1_image.tar
 
       - name: Build and export capital gains image
         uses: docker/build-push-action@v5
@@ -30,8 +29,7 @@ jobs:
           file: ./capital_gains/Dockerfile
           push: false
           tags: capital-gains:latest
-          outputs: |
-            image: /tmp/capital_gains_image.tar
+          outputs: type=docker ,dest=/tmp/capital_gains_image.tar
 
       - name: Upload Docker images as artifacts
         uses: actions/upload-artifact@v4
