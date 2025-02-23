@@ -4,12 +4,6 @@ import requests
 # Define the base URL for your API
 BASE_URL = "http://localhost:5001"  # Adjust this URL based on your setup
 
-def get_stocks_id():
-
-    response_ids = []
-
-
-
 def test_post_stocks():
     # Prepare the stock data for the POST requests
     stock_data = [
@@ -108,3 +102,10 @@ def test_get_portfolio_value():
 
 # Add more tests as needed
 
+# Main function to run tests in order
+if __name__ == "__main__":
+    test_post_stocks()
+    test_get_stock_by_id()
+    test_get_all_stocks()
+    test_get_stock_value()
+    test_get_portfolio_value()
