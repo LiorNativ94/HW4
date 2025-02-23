@@ -33,13 +33,17 @@ jobs:
           outputs: |
             type=tar,dest=/tmp/capital_gains_image.tar
 
-      - name: Upload Docker images as artifacts
+      - name: Upload stocks1 image as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: stockapp-images
-          path: |
-            /tmp/stocks1_image.tar
-            /tmp/capital_gains_image.tar
+          name: stocks1-image
+          path: /tmp/stocks1_image.tar
+
+      - name: Upload capital gains image as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: capital-gains-image
+          path: /tmp/capital_gains_image.tar
 
   test:
     runs-on: ubuntu-latest
@@ -57,6 +61,9 @@ jobs:
         run: |
           docker load -i /tmp/stocks1_image.tar
           docker load -i /tmp/capital_gains_image.tar
+
+      - name: List Docker images
+        run: docker image ls
 
       - name: Run Docker Compose
         run: |
