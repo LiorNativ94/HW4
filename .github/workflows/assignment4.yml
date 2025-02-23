@@ -14,24 +14,24 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and export stocks1 image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: ./stocks1
           file: ./stocks1/Dockerfile
           push: false
           tags: stocks1:latest
           outputs: |
-            type=tar,dest=/tmp/stocks1_image.tar
+            type=docker,dest=/tmp/stocks1_image.tar
 
       - name: Build and export capital gains image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: ./capital_gains
           file: ./capital_gains/Dockerfile
           push: false
           tags: capital-gains:latest
           outputs: |
-            type=tar,dest=/tmp/capital_gains_image.tar
+            type=docker,dest=/tmp/capital_gains_image.tar
 
       - name: Upload stocks1 image as artifact
         uses: actions/upload-artifact@v4
