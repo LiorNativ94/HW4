@@ -73,8 +73,8 @@ jobs:
         
       - name: Load Docker images
         run: |
-          docker load -i /tmp/stocks1_image.tar
-          docker load -i /tmp/capital_gains_image.tar
+          docker load --input /tmp/stocks1_image.tar
+          docker load --input /tmp/capital_gains_image.tar
 
       - name: List Docker images
         run: docker image ls
