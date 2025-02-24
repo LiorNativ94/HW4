@@ -44,20 +44,26 @@ def add_stock():
         return jsonify({"error": "Expected json media type"}), 415
 
     # Validate required fields
-    required_fields = {'symbol':str, 'purchase price': float, 'shares': int}
+    required_fields = {'symbol': str, 'purchase price': float, 'shares': int}
 
     for field, field_type in required_fields.items():
         if field not in data:
-            return jsonify({"error:"f"missing required field: {field}"}), 415
+            return jsonify({"error": f"missing required field: {field}"}), 400
         if not isinstance(data[field], field_type):
-            return jsonify({"error:":f"field {field} must be of type {field_type.__name__}"}), 415
+            return jsonify({"error": f"field {field} must be of type {field_type.__name__}"}), 415
 
-    #Validate stock symbol
+    # Validate purchase date format
+    if 'purchase date' in data:
+        try:
+            datetime.strptime(data['purchase date'], "%d-%m-%Y")  # Accepts format "18-06-2024"
+        except ValueError:
+            return jsonify({"error": "purchase date must be in format DD-MM-YYYY"}), 400
+
+    # Validate stock symbol
     symbol = data['symbol'].upper()
     # Check for duplicate symbol
     if stocks_collection.find_one({"symbol": symbol}):
         return jsonify({"error": "Stock symbol already exists"}), 400
-
 
     # Insert stock into MongoDB
     stock = {
@@ -168,17 +174,32 @@ def get_portfolio_value():
     """Calculate the total value of the portfolio."""
     try:
         total_value = 0
-        stocks = list(stocks_collection)
+        stocks = list(stocks_collection.find())
+        
+        if not stocks:
+            return jsonify({
+                "date": datetime.now().strftime("%d-%m-%Y"),
+                "portfolio value": 0
+            }), 200
+            
         for stock in stocks:
-            ticker_price = get_stock_price(stock["symbol"])
-            total_value += ticker_price * stock["shares"]
+            try:
+                ticker_price = get_stock_price(stock["symbol"])
+                if ticker_price is None:
+                    print(f"Failed to get price for {stock['symbol']}")
+                    continue
+                total_value += ticker_price * stock["shares"]
+            except Exception as stock_error:
+                print(f"Error processing stock {stock['symbol']}: {str(stock_error)}")
+                continue
         
         return jsonify({
             "date": datetime.now().strftime("%d-%m-%Y"),
             "portfolio value": round(total_value, 2)
         }), 200
     except Exception as e:
-        return jsonify({"server error": str(e)}), 500
+        print(f"Portfolio value error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/kill', methods =['GET'])
 def kill_container():
