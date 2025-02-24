@@ -1,8 +1,9 @@
 from data import stocks
 import requests
 
-# Define the base URL for your API
-BASE_URL = "http://localhost:5001"  # Adjust this URL based on your setup
+BASE_URL = "http://localhost:5001"
+
+STOCK2_ID = None
 
 def test_post_stocks():
     # Prepare the stock data for the POST requests
@@ -17,7 +18,7 @@ def test_post_stocks():
 
     for stock in stock_data:
         # Send POST request to /stock endpoint
-        response = requests.post(f"{BASE_URL}/stock", json=stock)
+        response = requests.post(f"{BASE_URL}/stocks", json=stock)
         
         # Check if the status code is 201
         assert response.status_code == 201, f"Expected status code 201 but got {response.status_code} for {stock['name']}"
@@ -100,7 +101,28 @@ def test_get_portfolio_value():
     # Check the portfolio value condition
     assert pv * 0.97 <= sv_total <= pv * 1.03, f"Portfolio value condition failed: {pv * 0.97} <= {sv_total} <= {pv * 1.03}"
 
-# Add more tests as needed
+def test_post_stock7_missing_symbol():
+    stock = stocks["stock7"]
+    response = requests.post(f"{BASE_URL}/stocks", json=stock)
+    assert response.status_code == 400, f"Expected status code 400 but got {response.status_code}"
+
+def test_delete_stock2():
+    global STOCK2_ID
+    stock_ids = get_all_stocks_id()  # Get all stock IDs
+    stock2_id = stock_ids[1]  # Assuming stock2 is the second stock
+    STOCK2_ID = stock2_id
+    response = requests.delete(f"{BASE_URL}/stocks/{stock2_id}")
+    assert response.status_code == 204, f"Expected status code 204 but got {response.status_code}"
+
+def test_get_stock2_after_deletion():
+    global STOCK2_ID
+    response = requests.get(f"{BASE_URL}/stocks/{STOCK2_ID}")
+    assert response.status_code == 404, f"Expected status code 404 but got {response.status_code}"
+
+def test_post_stock8_incorrect_date_format():
+    stock = stocks["stock8"]
+    response = requests.post(f"{BASE_URL}/stocks", json=stock)
+    assert response.status_code == 400, f"Expected status code 400 but got {response.status_code}"
 
 # Main function to run tests in order
 if __name__ == "__main__":
@@ -109,3 +131,7 @@ if __name__ == "__main__":
     test_get_all_stocks()
     test_get_stock_value()
     test_get_portfolio_value()
+    test_post_stock7_missing_symbol()
+    test_delete_stock2()
+    test_get_stock2_after_deletion()
+    test_post_stock8_incorrect_date_format()
