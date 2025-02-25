@@ -19,7 +19,7 @@ stocks_collection = db["stocks"]
 app = Flask(__name__)
 
 # Configuration
-NINJA_API_KEY = os.getenv('NINJA_API_KEY')
+NINJA_API_KEY = "0WmrbDjfZIsC3HyQ57AAVw==XrgmjX1A3aNZsahJ"
 
 # Utility functions
 def get_stock_price(symbol):
