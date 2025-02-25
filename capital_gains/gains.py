@@ -13,7 +13,6 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 app = Flask(__name__)
 
 STOCKS1_API_URL = 'http://stocks1:8000/stocks'
-STOCKS2_API_URL = 'http://stocks2:8000/stocks'
 STOCKS1_PORTFOLIO = 'stocks1'
 
 # Configuration
@@ -57,8 +56,7 @@ def capital_gains():
         else:
             logging.debug(f"fetching stocks from both portfolios")
             stocks1_response = requests.get(STOCKS1_API_URL)
-            stocks2_response = requests.get(STOCKS2_API_URL)
-            stocks = stocks1_response.json() + stocks2_response.json()
+            stocks = stocks1_response.json()
 
         # Filter stocks based on number of shares if necessary
         if numsharesgt_filter:
