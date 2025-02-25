@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: log-file
-          path: /tmp/log.txt
+          path: log.txt
 
   test:
     runs-on: ubuntu-latest
@@ -98,7 +98,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: log-file
-          path: /tmp
+          path: /
 
       - name: Verify downloaded artifact
         run: ls -l /tmp
