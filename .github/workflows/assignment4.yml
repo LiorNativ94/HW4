@@ -117,16 +117,29 @@ jobs:
         run: |
           echo "${{ env.start_time }}" > log.txt
           echo "Lior Nativ" >> log.txt
+          
+          # Debugging output for build outcomes
+          echo "Build Stocks1 Outcome: ${{ steps.build_stocks1.outcome }}" >> log.txt
+          echo "Build Capital Gains Outcome: ${{ steps.build_capital_gains.outcome }}" >> log.txt
+          
+          # Check the outcomes of the build steps
           if [ "${{ steps.build_stocks1.outcome }}" == "success" ] && [ "${{ steps.build_capital_gains.outcome }}" == "success" ]; then
             echo "images successfully built" >> log.txt
           else
             echo "images not able to be built" >> log.txt
           fi
+          
+          # Debugging output for container check result
+          echo "Container Check Result: ${{ steps.check_containers.outputs.result }}" >> log.txt
+          
+          # Check the result of the container check
           if [ "${{ steps.check_containers.outputs.result }}" == "Container up and running" ]; then
             echo "Container up and running" >> log.txt
           else
             echo "Container failed to run" >> log.txt
           fi
+          
+          # Check the test results
           if grep -q "failed" tests/test_results.txt; then
             echo "tests failed" >> log.txt
           else
