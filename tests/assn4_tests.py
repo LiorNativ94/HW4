@@ -6,7 +6,6 @@ BASE_URL = "http://localhost:5001"
 
 STOCK2_ID = None
 
-@pytest.mark.order(1)
 def test_post_stocks():
     # Prepare the stock data for the POST requests
     stock_data = [
@@ -41,7 +40,6 @@ def get_all_stocks_id():
     stock_ids = [stock["_id"] for stock in response_json]  # Assuming each stock has an "_id" field
     return stock_ids
 
-@pytest.mark.order(2)
 def test_get_stock_by_id():
     stock_ids = get_all_stocks_id()  # Get all stock IDs
     stock_id = stock_ids[0]  # Assuming you want to test the first stock ID
@@ -55,7 +53,6 @@ def test_get_stock_by_id():
     # Check if the status code is 200
     assert response.status_code == 200, f"Expected status code 200 but got {response.status_code}"
 
-@pytest.mark.order(3)
 def test_get_all_stocks():
     # Execute a GET request for all stocks
     response = requests.get(f"{BASE_URL}/stocks")  # Adjust the URL as necessary
@@ -66,7 +63,6 @@ def test_get_all_stocks():
     # Check if the status code is 200
     assert response.status_code == 200, f"Expected status code 200 but got {response.status_code}"
 
-@pytest.mark.order(4)
 def test_get_stock_value():
     stock_ids = get_all_stocks_id()  # Get all stock IDs
     stock_values = []
@@ -88,7 +84,6 @@ def test_get_stock_value():
 
     return stock_values  # Return the list of stock values
 
-@pytest.mark.order(5)
 def test_get_portfolio_value():
     # Execute a GET request for portfolio value
     response = requests.get(f"{BASE_URL}/portfolio-value")  # Adjust the URL as necessary
@@ -107,13 +102,11 @@ def test_get_portfolio_value():
     # Check the portfolio value condition
     assert pv * 0.97 <= sv_total <= pv * 1.03, f"Portfolio value condition failed: {pv * 0.97} <= {sv_total} <= {pv * 1.03}"
 
-@pytest.mark.order(6)
 def test_post_stock7_missing_symbol():
     stock = stocks["stock7"]
     response = requests.post(f"{BASE_URL}/stocks", json=stock)
     assert response.status_code == 400, f"Expected status code 400 but got {response.status_code}"
 
-@pytest.mark.order(7)
 def test_delete_stock2():
     global STOCK2_ID
     stock_ids = get_all_stocks_id()  # Get all stock IDs
@@ -122,14 +115,24 @@ def test_delete_stock2():
     response = requests.delete(f"{BASE_URL}/stocks/{stock2_id}")
     assert response.status_code == 204, f"Expected status code 204 but got {response.status_code}"
 
-@pytest.mark.order(8)
 def test_get_stock2_after_deletion():
     global STOCK2_ID
     response = requests.get(f"{BASE_URL}/stocks/{STOCK2_ID}")
     assert response.status_code == 404, f"Expected status code 404 but got {response.status_code}"
 
-@pytest.mark.order(9)
 def test_post_stock8_incorrect_date_format():
     stock = stocks["stock8"]
     response = requests.post(f"{BASE_URL}/stocks", json=stock)
     assert response.status_code == 400, f"Expected status code 400 but got {response.status_code}"
+
+# Main function to run tests in order
+if __name__ == "__main__":
+    test_post_stocks()
+    test_get_stock_by_id()
+    test_get_all_stocks()
+    test_get_stock_value()
+    test_get_portfolio_value()
+    test_post_stock7_missing_symbol()
+    test_delete_stock2()
+    test_get_stock2_after_deletion()
+    test_post_stock8_incorrect_date_format()
