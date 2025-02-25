@@ -17,7 +17,7 @@ STOCKS2_API_URL = 'http://stocks2:8000/stocks'
 STOCKS1_PORTFOLIO = 'stocks1'
 
 # Configuration
-NINJA_API_KEY = os.getenv('NINJA_API_KEY')
+NINJA_API_KEY = "0WmrbDjfZIsC3HyQ57AAVw==XrgmjX1A3aNZsahJ"
 
 # Utility functions
 def get_stock_price(symbol):
