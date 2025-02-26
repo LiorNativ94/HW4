@@ -2,5 +2,5 @@ stocks: symbol=NVDA
 stocks: symbol=AAPL
 stocks: shares=14
 stocks: shares=7
-capital-gains: portfolio=stocks1
 capital-gains: numsharesgt=10
+capital-gains: portfolio=stocks1
