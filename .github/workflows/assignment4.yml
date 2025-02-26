@@ -258,12 +258,12 @@ jobs:
           while IFS= read -r line; do
               if [[ $line == stocks:* ]]; then
                   qs="${line#stocks: }"
-                  response=$(curl -X GET "http://localhost:5001/stocks?$qs")
+                  response=$(curl -X GET "http://localhost:5001/stocks?$qs") || true
                   echo "stocks: $qs" >> $response_file
                   echo "$response" >> $response_file
               elif [[ $line == capital-gains:* ]]; then
                   qs="${line#capital-gains: }"
-                  response=$(curl -X GET "http://localhost:5001/capital-gains?$qs")
+                  response=$(curl -X GET "http://localhost:5001/capital-gains?$qs") || true
                   echo "capital-gains: $qs" >> $response_file
                   echo "$response" >> $response_file
               fi
