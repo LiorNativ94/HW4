@@ -70,12 +70,11 @@ jobs:
           name: capital-gains-image
           path: /tmp/capital_gains_image.tar
 
-      - name: Upload log file
+      - name: Upload log.txt as artifact
         uses: actions/upload-artifact@v4
         with:
           name: log-file
           path: log.txt
-          overwrite: true
 
   test:
     runs-on: ubuntu-latest
@@ -180,13 +179,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install jq
-        run: sudo apt-get install jq
-
       - name: Run Docker Compose
         run: |
           docker compose -f docker-compose.yml up -d
 
+      - name: Wait for docker compose to run up
+        run: sleep 10
+
+      - name: Check containers
+        run: docker ps
 
       - name: Add stocks
         run: |
