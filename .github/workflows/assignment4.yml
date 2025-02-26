@@ -70,11 +70,12 @@ jobs:
           name: capital-gains-image
           path: /tmp/capital_gains_image.tar
 
-      - name: Upload log.txt as artifact
+      - name: Upload log file
         uses: actions/upload-artifact@v4
         with:
           name: log-file
           path: log.txt
+          overwrite: true
 
   test:
     runs-on: ubuntu-latest
@@ -171,6 +172,7 @@ jobs:
         with:
           name: log-file
           path: log.txt
+          overwrite: true
 
   query:
     runs-on: ubuntu-latest
@@ -185,30 +187,74 @@ jobs:
         run: |
           docker compose -f docker-compose.yml up -d
 
-      - name: Add stocks from data.py
+
+      - name: Add stocks
         run: |
-          stocks=$(python -c "import json; from hw4.tests.data import stocks; print(json.dumps([{
-              'name': stock['name'],
-              'symbol': stock['symbol'],
-              'purchase price': stock['purchase price'],
-              'purchase date': stock['purchase date'],
-              'shares': stock['shares']
-          } for stock in stocks.values()[:6]))")
-
-          for stock in $(echo "${stocks}" | jq -c '.[]'); do
-              curl -X POST http://localhost:5001/stocks \
-              -H "Content-Type: application/json" \
-              -d "${stock}"
-          done
-
+          curl -X POST http://localhost:5001/stocks \
+          -H "Content-Type: application/json" \
+          -d '{
+              "name": "NVIDIA Corporation",
+              "symbol": "NVDA",
+              "purchase price": 134.66,
+              "purchase date": "18-06-2024",
+              "shares": 7
+          }'
+          
+          curl -X POST http://localhost:5001/stocks \
+          -H "Content-Type: application/json" \
+          -d '{
+              "name": "Apple Inc.",
+              "symbol": "AAPL",
+              "purchase price": 183.63,
+              "purchase date": "22-02-2024",
+              "shares": 19
+          }'
+          
+          curl -X POST http://localhost:5001/stocks \
+          -H "Content-Type: application/json" \
+          -d '{
+              "name": "Alphabet Inc.",
+              "symbol": "GOOG",
+              "purchase price": 140.12,
+              "purchase date": "24-10-2024",
+              "shares": 14
+          }'
+          
+          curl -X POST http://localhost:5001/stocks \
+          -H "Content-Type: application/json" \
+          -d '{
+              "name": "Tesla, Inc.",
+              "symbol": "TSLA",
+              "purchase price": 194.58,
+              "purchase date": "28-11-2022",
+              "shares": 32
+          }'
+          
+          curl -X POST http://localhost:5001/stocks \
+          -H "Content-Type: application/json" \
+          -d '{
+              "name": "Microsoft Corporation",
+              "symbol": "MSFT",
+              "purchase price": 420.55,
+              "purchase date": "09-02-2024",
+              "shares": 35
+          }'
+          
+          curl -X POST http://localhost:5001/stocks \
+          -H "Content-Type: application/json" \
+          -d '{
+              "name": "Intel Corporation",
+              "symbol": "INTC",
+              "purchase price": 19.15,
+              "purchase date": "13-01-2025",
+              "shares": 10
+          }'
       - name: Execute Queries from query.txt
         run: |
           response_file="response.txt"
           > $response_file  # Clear the response file
 
           while IFS= read -r line; do
-              # Remove any leading/trailing whitespace
-              line=$(echo "$line" | xargs)
               if [[ $line == stocks:* ]]; then
                   qs="${line#stocks: }"
                   response=$(curl -X GET "http://localhost:5001/stocks?$qs")
@@ -227,5 +273,3 @@ jobs:
         with:
           name: response-file
           path: response.txt
-
-  
