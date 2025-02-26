@@ -169,5 +169,63 @@ jobs:
       - name: Upload log file
         uses: actions/upload-artifact@v4
         with:
-          name: workflow-log
+          name: log-file
           path: log.txt
+
+  query:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Run Docker Compose
+        run: |
+          docker compose -f docker-compose.yml up -d
+
+      - name: Add stocks from data.py
+        run: |
+          stocks=$(python -c "import json; from hw4.tests.data import stocks; print(json.dumps([{
+              'name': stock['name'],
+              'symbol': stock['symbol'],
+              'purchase price': stock['purchase price'],
+              'purchase date': stock['purchase date'],
+              'shares': stock['shares']
+          } for stock in stocks.values()[:6]))")
+
+          for stock in $(echo "${stocks}" | jq -c '.[]'); do
+              curl -X POST http://localhost:5001/stocks \
+              -H "Content-Type: application/json" \
+              -d "${stock}"
+          done
+
+      - name: Execute Queries from query.txt
+        run: |
+          response_file="response.txt"
+          > $response_file  # Clear the response file
+
+          while IFS= read -r line; do
+              # Remove any leading/trailing whitespace
+              line=$(echo "$line" | xargs)
+              if [[ $line == stocks:* ]]; then
+                  qs="${line#stocks: }"
+                  response=$(curl -X GET "http://localhost:5001/stocks?$qs")
+                  echo "stocks: $qs" >> $response_file
+                  echo "$response" >> $response_file
+              elif [[ $line == capital-gains:* ]]; then
+                  qs="${line#capital-gains: }"
+                  response=$(curl -X GET "http://localhost:5001/capital-gains?$qs")
+                  echo "capital-gains: $qs" >> $response_file
+                  echo "$response" >> $response_file
+              fi
+          done < tests/query.txt  
+
+      - name: Upload response.txt as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: response-file
+          path: response.txt
+
+  
