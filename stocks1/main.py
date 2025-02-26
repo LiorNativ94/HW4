@@ -19,8 +19,8 @@ stocks_collection = db["stocks"]
 app = Flask(__name__)
 
 # Configuration
+# NINJA_API_KEY = os.getenv('NINJA_API_KEY')
 NINJA_API_KEY = "0WmrbDjfZIsC3HyQ57AAVw==XrgmjX1A3aNZsahJ"
-
 # Utility functions
 def get_stock_price(symbol):
     symbol = symbol.strip('"').strip("'")  
@@ -79,9 +79,27 @@ def add_stock():
 
 @app.route('/stocks', methods=['GET'])
 def get_stocks():
-    """Get all stocks in the portfolio."""
+    """Get all stocks in the portfolio, optionally filtered by query parameters."""
     try:
+        query_params = request.args  # Get query parameters from the request
         stocks = list(stocks_collection.find())
+
+        # Filter stocks based on query parameters
+        if query_params:
+            for key, value in query_params.items():
+                # Determine the expected type for each key
+                if key in ['purchase price']:
+                    # Convert to float for comparison
+                    value = float(value)
+                    stocks = [stock for stock in stocks if stock.get(key) == value]
+                elif key in ['shares']:
+                    # Convert to int for comparison
+                    value = int(value)
+                    stocks = [stock for stock in stocks if stock.get(key) == value]
+                else:
+                    # Default to string comparison for other fields
+                    stocks = [stock for stock in stocks if str(stock.get(key, '')).lower() == value.lower()]
+
         for stock in stocks:
             stock["_id"] = str(stock["_id"])
         return jsonify(stocks), 200
