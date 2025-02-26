@@ -263,7 +263,7 @@ jobs:
                   echo "$response" >> $response_file
               elif [[ $line == capital-gains:* ]]; then
                   qs="${line#capital-gains: }"
-                  response=$(curl -X GET "http://localhost:5001/capital-gains?$qs") || true
+                  response=$(curl -X GET "http://localhost:5003/capital-gains?$qs") || true
                   echo "capital-gains: $qs" >> $response_file
                   echo "$response" >> $response_file
               fi
