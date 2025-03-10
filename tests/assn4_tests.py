@@ -51,7 +51,7 @@ def test_get_stock_by_id():
     # Check if the symbol field equals "NVDA"
     assert response_json["symbol"] == "NVDA", f"Expected symbol 'NVDA' but got {response_json['symbol']}"
     # Check if the status code is 200
-    assert response.status_code == 404, f"Expected status code 200 but got {response.status_code}"
+    assert response.status_code == 200, f"Expected status code 200 but got {response.status_code}"
 
 def test_get_all_stocks():
     # Execute a GET request for all stocks
